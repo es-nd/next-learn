@@ -1,0 +1,27 @@
+version: '3.9'
+services:
+  db:
+    image: postgres:14.18
+    # container_name は省くとスタックを複数立てやすいです
+    ports:
+      - "127.0.0.1:5432:5432"   # ローカルのみ公開
+    environment:
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: sample
+      TZ: Asia/Tokyo
+      # 初期化時にエンコード/ロケール指定（初回だけ有効）
+      POSTGRES_INITDB_ARGS: "--encoding=UTF8 --locale=C"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      # 任意: 初期化 SQL を置くと自動実行されます（./init に作成）
+      - ./init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  pgdata:
