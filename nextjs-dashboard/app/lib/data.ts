@@ -1,3 +1,4 @@
+import 'dotenv/config'; // dotenv の即時読み込み
 import postgres from 'postgres';
 import {
   CustomerField,
@@ -9,7 +10,13 @@ import {
 } from './definitions';
 import { formatCurrency } from './utils';
 
-const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
+const sql = postgres({
+  host: process.env.POSTGRES_HOST,
+  port: Number(process.env.POSTGRES_PORT),
+  database: process.env.POSTGRES_DATABASE,
+  username: process.env.POSTGRES_USER,
+  password: process.env.POSTGRES_PASSWORD,
+});
 
 export async function fetchRevenue() {
   try {
